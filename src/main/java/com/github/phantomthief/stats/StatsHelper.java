@@ -55,6 +55,12 @@ public class StatsHelper<T, C> {
         return statsMap;
     }
 
+    public <K, V> Map<K, Map<String, V>> getFriendlyStats( //
+            Function<T, K> nameFormatter, //
+            Function<C, V> counterFormatter) {
+        return getFriendlyStats(nameFormatter, SimpleDurationFormatter.of(), counterFormatter);
+    }
+
     public <K, D, V> Map<K, Map<D, V>> getFriendlyStats( //
             Function<T, K> nameFormatter, //
             Function<Long, D> durationFormatter, //
