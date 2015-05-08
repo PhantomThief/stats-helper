@@ -102,9 +102,6 @@ public class StatsHelper<T, C> {
             return new StatsHelper<>(scheduledExecutorService, counterResetter, duration);
         }
 
-        /**
-         * 
-         */
         private void ensure() {
             if (scheduledExecutorService == null) {
                 scheduledExecutorService = Executors.newScheduledThreadPool(1);
