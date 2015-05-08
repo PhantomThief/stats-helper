@@ -110,7 +110,9 @@ public class StatsHelper<T, C> {
                 throw new IllegalArgumentException("no counter resetter found.");
             }
             if (duration.isEmpty()) {
-                throw new IllegalArgumentException("duration is empty.");
+                addDuration(1, TimeUnit.SECONDS);
+                addDuration(1, TimeUnit.MINUTES);
+                addDuration(1, TimeUnit.HOURS);
             }
         }
     }
