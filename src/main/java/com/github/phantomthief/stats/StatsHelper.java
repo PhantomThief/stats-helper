@@ -16,6 +16,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 /**
  * @author w.vela
  */
@@ -39,7 +41,7 @@ public class StatsHelper<T, C> {
                     .forEach(duration -> scheduledExecutorService.scheduleWithFixedDelay(() -> {
                         statsMap.values().forEach(map -> {
                             map.computeIfPresent(duration, (d, old) -> this.resetter.apply(old));
-                        } );
+                        });
                     } , duration, duration, TimeUnit.MILLISECONDS));
         }
     }
@@ -97,8 +99,8 @@ public class StatsHelper<T, C> {
             return this;
         }
 
-        public Builder<C> setScheduledExecutorService(
-                ScheduledExecutorService scheduledExecutorService) {
+        public Builder<C>
+                setScheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
             this.scheduledExecutorService = scheduledExecutorService;
             return this;
         }
@@ -109,11 +111,15 @@ public class StatsHelper<T, C> {
         }
 
         private void ensure() {
-            if (scheduledExecutorService == null) {
-                scheduledExecutorService = Executors.newScheduledThreadPool(1);
-            }
             if (counterResetter == null) {
                 throw new IllegalArgumentException("no counter resetter found.");
+            }
+            if (scheduledExecutorService == null) {
+                scheduledExecutorService = Executors.newScheduledThreadPool(1,
+                        new ThreadFactoryBuilder() //
+                                .setNameFormat("scheduled-stats-helper-%d") //
+                                .setPriority(Thread.MIN_PRIORITY) //
+                                .build());
             }
             if (duration.isEmpty()) {
                 addDuration(1, TimeUnit.SECONDS);
