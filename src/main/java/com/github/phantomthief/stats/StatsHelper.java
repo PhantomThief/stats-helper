@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
@@ -111,14 +112,13 @@ public class StatsHelper<T, C> {
         }
 
         private void ensure() {
-            if (counterResetter == null) {
-                throw new IllegalArgumentException("no counter resetter found.");
-            }
+            Preconditions.checkNotNull(counterResetter, "no counter resetter found.");
             if (scheduledExecutorService == null) {
                 scheduledExecutorService = Executors.newScheduledThreadPool(1,
                         new ThreadFactoryBuilder() //
                                 .setNameFormat("scheduled-stats-helper-%d") //
                                 .setPriority(Thread.MIN_PRIORITY) //
+                                .setDaemon(true) //
                                 .build());
             }
             if (duration.isEmpty()) {
