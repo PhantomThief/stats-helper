@@ -38,12 +38,11 @@ public class StatsHelper<T, C> {
         this.resetDuration = resetDuration;
         this.resetter = resetter;
         if (resetDuration != null) {
-            resetDuration
-                    .forEach(duration -> scheduledExecutorService.scheduleWithFixedDelay(() -> {
-                        statsMap.values().forEach(map -> {
-                            map.computeIfPresent(duration, (d, old) -> this.resetter.apply(old));
-                        });
-                    } , duration, duration, TimeUnit.MILLISECONDS));
+            resetDuration.forEach(duration -> scheduledExecutorService.scheduleAtFixedRate(() -> {
+                statsMap.values().forEach(map -> {
+                    map.computeIfPresent(duration, (d, old) -> this.resetter.apply(old));
+                });
+            } , duration, duration, TimeUnit.MILLISECONDS));
         }
     }
 
