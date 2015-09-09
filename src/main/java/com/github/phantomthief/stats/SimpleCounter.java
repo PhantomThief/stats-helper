@@ -47,7 +47,7 @@ public class SimpleCounter {
     @Override
     public String toString() {
         return "count:" + count + ", cost:" + cost + ", avgCost:"
-                + (double) (cost.get()) / count.get() + "resetTime:"
+                + (double) (cost.get()) / count.get() + ", resetTime:"
                 + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(resetTime);
     }
 
