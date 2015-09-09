@@ -3,6 +3,7 @@
  */
 package com.github.phantomthief.stats;
 
+import java.text.SimpleDateFormat;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -41,6 +42,13 @@ public class SimpleCounter {
 
     public static UnaryOperator<SimpleCounter> resetter() {
         return old -> new SimpleCounter();
+    }
+
+    @Override
+    public String toString() {
+        return "count:" + count + ", cost:" + cost + ", avgCost:"
+                + (double) (cost.get()) / count.get() + "resetTime:"
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(resetTime);
     }
 
 }
