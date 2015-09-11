@@ -51,19 +51,20 @@ public class SingleStatsHelper<C> {
         private final com.github.phantomthief.stats.StatsHelper.Builder<C> builder = StatsHelper
                 .newBuilder();
 
-        public com.github.phantomthief.stats.StatsHelper.Builder<C> addDuration(long duration,
-                TimeUnit timeUnit) {
-            return builder.addDuration(duration, timeUnit);
+        public Builder<C> addDuration(long duration, TimeUnit timeUnit) {
+            builder.addDuration(duration, timeUnit);
+            return this;
         }
 
-        public com.github.phantomthief.stats.StatsHelper.Builder<C>
-                setCounterReset(UnaryOperator<C> resetter) {
-            return builder.setCounterReset(resetter);
+        public Builder<C> setCounterReset(UnaryOperator<C> resetter) {
+            builder.setCounterReset(resetter);
+            return this;
         }
 
-        public com.github.phantomthief.stats.StatsHelper.Builder<C>
+        public Builder<C>
                 setScheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
-            return builder.setScheduledExecutorService(scheduledExecutorService);
+            builder.setScheduledExecutorService(scheduledExecutorService);
+            return this;
         }
 
         public SingleStatsHelper<C> build() {
