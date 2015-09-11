@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -17,7 +16,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * @author w.vela
@@ -113,12 +111,7 @@ public class StatsHelper<T, C> {
         private void ensure() {
             Preconditions.checkNotNull(counterResetter, "no counter resetter found.");
             if (scheduledExecutorService == null) {
-                scheduledExecutorService = Executors.newScheduledThreadPool(1,
-                        new ThreadFactoryBuilder() //
-                                .setNameFormat("scheduled-stats-helper-%d") //
-                                .setPriority(Thread.MIN_PRIORITY) //
-                                .setDaemon(true) //
-                                .build());
+                scheduledExecutorService = SharedStatsScheduledExecutorHolder.getInstance();
             }
             if (duration.isEmpty()) {
                 addDuration(1, TimeUnit.SECONDS);
