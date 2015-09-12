@@ -3,6 +3,10 @@
  */
 package com.github.phantomthief.stats;
 
+import static com.github.phantomthief.stats.SimpleDurationFormatter.HOUR;
+import static com.github.phantomthief.stats.SimpleDurationFormatter.MINUTE;
+import static com.github.phantomthief.stats.SimpleDurationFormatter.TEN_SECOND;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -114,9 +118,9 @@ public class StatsHelper<T, C> {
                 scheduledExecutorService = SharedStatsScheduledExecutorHolder.getInstance();
             }
             if (duration.isEmpty()) {
-                addDuration(1, TimeUnit.SECONDS);
-                addDuration(1, TimeUnit.MINUTES);
-                addDuration(1, TimeUnit.HOURS);
+                addDuration(TEN_SECOND, TimeUnit.MILLISECONDS);
+                addDuration(MINUTE, TimeUnit.MILLISECONDS);
+                addDuration(HOUR, TimeUnit.MILLISECONDS);
             }
         }
     }
