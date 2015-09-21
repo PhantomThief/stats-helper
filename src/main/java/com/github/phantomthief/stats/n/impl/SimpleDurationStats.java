@@ -3,6 +3,9 @@
  */
 package com.github.phantomthief.stats.n.impl;
 
+import static java.util.stream.Collectors.toMap;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,14 +14,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.github.phantomthief.stats.SharedStatsScheduledExecutorHolder;
 import com.github.phantomthief.stats.n.DurationStats;
+import com.github.phantomthief.stats.n.MultiDurationStats;
 import com.github.phantomthief.stats.n.counter.Duration;
 import com.github.phantomthief.stats.n.counter.SimpleCounter;
 import com.github.phantomthief.stats.n.util.DurationStatsUtils;
@@ -29,6 +35,8 @@ import com.google.common.base.Preconditions;
  * @author w.vela
  */
 public class SimpleDurationStats<V extends Duration> implements DurationStats<V>, AutoCloseable {
+
+    private static org.slf4j.Logger logger = getLogger(SimpleDurationStats.class);
 
     private final Map<Long, V> counters = new ConcurrentHashMap<>();
     private final Set<Long> statsDurations;
@@ -62,9 +70,13 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
      */
     @Override
     public void stat(Consumer<V> statsFunction) {
-        long timePoint = System.currentTimeMillis() / duration * duration;
-        V counter = counters.computeIfAbsent(timePoint, t -> counterFactory.apply(duration));
-        statsFunction.accept(counter);
+        try {
+            long timePoint = System.currentTimeMillis() / duration * duration;
+            V counter = counters.computeIfAbsent(timePoint, t -> counterFactory.apply(duration));
+            statsFunction.accept(counter);
+        } catch (Throwable e) {
+            logger.error("Ops.", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -92,6 +104,38 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
         cleanupScheduledFuture.cancel(false);
     }
 
+    public static final class SimpleMultiDurationStats<K, V extends Duration>
+                                                      implements MultiDurationStats<K, V> {
+
+        private final ConcurrentMap<K, DurationStats<V>> map = new ConcurrentHashMap<>();
+        private final Supplier<SimpleDurationStats<V>> statsFactory;
+
+        /**
+         * @param statsFactory
+         */
+        private SimpleMultiDurationStats(Supplier<SimpleDurationStats<V>> statsFactory) {
+            this.statsFactory = statsFactory;
+        }
+
+        /* (non-Javadoc)
+         * @see com.github.phantomthief.stats.n.MultiDurationStats#stat(java.lang.Object, java.util.function.Consumer)
+         */
+        @Override
+        public void stat(K key, Consumer<V> statsFunction) {
+            map.computeIfAbsent(key, k -> statsFactory.get()).stat(statsFunction);
+        }
+
+        /* (non-Javadoc)
+         * @see com.github.phantomthief.stats.n.MultiDurationStats#getStats()
+         */
+        @Override
+        public Map<K, Map<Long, V>> getStats() {
+            return map.entrySet().stream()
+                    .collect(toMap(Entry::getKey, e -> e.getValue().getStats()));
+        }
+
+    }
+
     public static final class Builder {
 
         private final Set<Long> statsDurations = new HashSet<>();
@@ -117,6 +161,20 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
             ensure();
             return new SimpleDurationStats<>(statsDurations, duration, counterFactory,
                     counterMerger);
+        }
+
+        public <K> SimpleMultiDurationStats<K, SimpleCounter> buildMulti() {
+            return buildMulti(SimpleCounter::new);
+        }
+
+        public <K, V extends Duration> SimpleMultiDurationStats<K, V>
+                buildMulti(Function<Long, V> counterFactory) {
+            return buildMulti(counterFactory, DurationStatsUtils::merge);
+        }
+
+        public <K, V extends Duration> SimpleMultiDurationStats<K, V>
+                buildMulti(Function<Long, V> counterFactory, BinaryOperator<V> counterMerger) {
+            return new SimpleMultiDurationStats<>(() -> build(counterFactory, counterMerger));
         }
 
         private void ensure() {
