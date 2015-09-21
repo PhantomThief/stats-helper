@@ -15,6 +15,7 @@ import java.util.function.UnaryOperator;
 /**
  * @author w.vela
  */
+@Deprecated
 public class SingleStatsHelper<C> {
 
     private static final String DEFAULT_KEY = "s";

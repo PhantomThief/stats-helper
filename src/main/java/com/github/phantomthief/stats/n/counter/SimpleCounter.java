@@ -1,24 +1,26 @@
 /**
  * 
  */
-package com.github.phantomthief.stats;
+package com.github.phantomthief.stats.n.counter;
 
-import java.text.SimpleDateFormat;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /**
  * @author w.vela
  */
-@Deprecated
-public class SimpleCounter {
+public class SimpleCounter implements Duration {
 
     private final AtomicLong count = new AtomicLong();
-
     private final AtomicLong cost = new AtomicLong();
+    private long duration;
 
-    private final long resetTime = System.currentTimeMillis();
+    /**
+     * @param duration
+     */
+    public SimpleCounter(long duration) {
+        this.duration = duration;
+    }
 
     private void doStats(long cost) {
         this.count.incrementAndGet();
@@ -33,23 +35,28 @@ public class SimpleCounter {
         return cost.get();
     }
 
-    public long getResetTime() {
-        return resetTime;
+    public double getQPS() {
+        return (double) count.get() / duration * 1000;
     }
 
     public static Consumer<SimpleCounter> stats(long cost) {
         return counter -> counter.doStats(cost);
     }
 
-    public static UnaryOperator<SimpleCounter> resetter() {
-        return old -> new SimpleCounter();
-    }
-
     @Override
     public String toString() {
         return "count:" + count + ", cost:" + cost + ", avgCost:"
-                + (double) (cost.get()) / count.get() + ", resetTime:"
-                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(resetTime);
+                + (double) (cost.get()) / count.get();
+    }
+
+    @Override
+    public long duration() {
+        return duration;
+    }
+
+    @Override
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
 }

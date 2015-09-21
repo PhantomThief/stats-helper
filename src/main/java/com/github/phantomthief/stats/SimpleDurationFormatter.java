@@ -9,6 +9,7 @@ import java.util.function.Function;
 /**
  * @author w.vela
  */
+@Deprecated
 public class SimpleDurationFormatter {
 
     public static final long TEN_SECOND = TimeUnit.SECONDS.toMillis(10);

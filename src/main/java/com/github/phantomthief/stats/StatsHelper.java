@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author w.vela
  */
+@Deprecated
 public class StatsHelper<T, C> {
 
     private final Map<T, Map<Long, C>> statsMap = new ConcurrentHashMap<>();
@@ -124,5 +125,4 @@ public class StatsHelper<T, C> {
             }
         }
     }
-
 }
