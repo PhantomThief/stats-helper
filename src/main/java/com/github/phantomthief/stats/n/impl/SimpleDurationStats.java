@@ -65,7 +65,8 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                             }
                             iterator.remove();
                         }
-                        if (now - entry.getKey() > MERGE_THRESHOLD) {
+                        if (entry.getValue().duration() == SECOND
+                                && now - entry.getKey() > MERGE_THRESHOLD) {
                             long mergedKey = entry.getKey() / MINUTE * MINUTE;
                             counters.merge(mergedKey, entry.getValue(), counterMerger);
                             iterator.remove();
