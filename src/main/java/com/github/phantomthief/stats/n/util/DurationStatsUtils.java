@@ -5,6 +5,8 @@ package com.github.phantomthief.stats.n.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -60,5 +62,37 @@ public final class DurationStatsUtils {
         field.setAccessible(true);
         Object object = field.get(result);
         return getter.apply((Number) object);
+    }
+
+    public static <K, T extends Duration, R> Map<String, R> format(Map<Long, T> map,
+            Function<T, R> valueConverter) {
+        Map<String, R> result = new HashMap<>();
+        map.forEach((period, stat) -> {
+            result.put(SimpleDurationFormatter.format(period), valueConverter.apply(stat));
+        });
+        return result;
+    }
+
+    public static <K, T extends Duration, R> Map<String, Map<String, R>> format(
+            Map<K, Map<Long, T>> map, Function<K, String> keyConverter,
+            Function<T, R> valueConverter) {
+        Map<String, Map<String, R>> result = new HashMap<>();
+        map.forEach((key, stats) -> {
+            stats.forEach((period, stat) -> {
+                result.merge(keyConverter.apply(key),
+                        single(SimpleDurationFormatter.format(period), valueConverter.apply(stat)),
+                        (m1, m2) -> {
+                    m1.putAll(m2);
+                    return m1;
+                });
+            });
+        });
+        return result;
+    }
+
+    private static <K, V> Map<K, V> single(K key, V value) {
+        Map<K, V> map = new HashMap<>();
+        map.put(key, value);
+        return map;
     }
 }

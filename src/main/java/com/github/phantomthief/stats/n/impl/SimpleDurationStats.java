@@ -37,19 +37,19 @@ import com.google.common.base.Preconditions;
 public class SimpleDurationStats<V extends Duration> implements DurationStats<V>, AutoCloseable {
 
     private static org.slf4j.Logger logger = getLogger(SimpleDurationStats.class);
+    private static final long SECOND = TimeUnit.SECONDS.toMillis(1);
+    private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
 
     private final Map<Long, V> counters = new ConcurrentHashMap<>();
     private final Set<Long> statsDurations;
-    private final long duration;
     private final Function<Long, V> counterFactory;
     private final BinaryOperator<V> counterMerger;
     private final ScheduledFuture<?> cleanupScheduledFuture;
 
-    private SimpleDurationStats(Set<Long> statsDurations, long duration,
-            Function<Long, V> counterFactory, BinaryOperator<V> counterMerger) {
+    private SimpleDurationStats(Set<Long> statsDurations, Function<Long, V> counterFactory,
+            BinaryOperator<V> counterMerger) {
         long maxTimePeriod = statsDurations.stream().max(Comparator.naturalOrder()).get();
         this.statsDurations = statsDurations;
-        this.duration = duration;
         this.counterFactory = counterFactory;
         this.counterMerger = counterMerger;
         this.cleanupScheduledFuture = SharedStatsScheduledExecutorHolder.getInstance()
@@ -61,6 +61,9 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                         if (now - entry.getKey() > maxTimePeriod) {
                             iterator.remove();
                         }
+                        if (now - entry.getKey() > MINUTE) { // TODO merge by minute
+
+                        }
                     }
                 } , 1, 1, TimeUnit.MINUTES);
     }
@@ -71,8 +74,8 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
     @Override
     public void stat(Consumer<V> statsFunction) {
         try {
-            long timePoint = System.currentTimeMillis() / duration * duration;
-            V counter = counters.computeIfAbsent(timePoint, t -> counterFactory.apply(duration));
+            long timePoint = System.currentTimeMillis() / SECOND * SECOND;
+            V counter = counters.computeIfAbsent(timePoint, t -> counterFactory.apply(SECOND));
             statsFunction.accept(counter);
         } catch (Throwable e) {
             logger.error("Ops.", e);
@@ -139,7 +142,6 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
     public static final class Builder {
 
         private final Set<Long> statsDurations = new HashSet<>();
-        private long duration = TimeUnit.SECONDS.toMillis(1);
 
         public Builder addDuration(long time, TimeUnit unit) {
             statsDurations.add(unit.toMillis(time));
@@ -159,8 +161,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
             Preconditions.checkNotNull(counterFactory);
             Preconditions.checkNotNull(counterMerger);
             ensure();
-            return new SimpleDurationStats<>(statsDurations, duration, counterFactory,
-                    counterMerger);
+            return new SimpleDurationStats<>(statsDurations, counterFactory, counterMerger);
         }
 
         public <K> SimpleMultiDurationStats<K, SimpleCounter> buildMulti() {
