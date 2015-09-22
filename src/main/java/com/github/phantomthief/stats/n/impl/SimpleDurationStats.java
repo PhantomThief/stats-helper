@@ -22,12 +22,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.github.phantomthief.stats.SharedStatsScheduledExecutorHolder;
 import com.github.phantomthief.stats.n.DurationStats;
 import com.github.phantomthief.stats.n.MultiDurationStats;
 import com.github.phantomthief.stats.n.counter.Duration;
 import com.github.phantomthief.stats.n.counter.SimpleCounter;
 import com.github.phantomthief.stats.n.util.DurationStatsUtils;
+import com.github.phantomthief.stats.n.util.SharedStatsScheduledExecutorHolder;
 import com.github.phantomthief.stats.n.util.SimpleDurationFormatter;
 import com.google.common.base.Preconditions;
 
@@ -39,6 +39,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
     private static org.slf4j.Logger logger = getLogger(SimpleDurationStats.class);
     private static final long SECOND = TimeUnit.SECONDS.toMillis(1);
     private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
+    private static final long MERGE_THRESHOLD = TimeUnit.MINUTES.toMillis(2);
 
     private final Map<Long, V> counters = new ConcurrentHashMap<>();
     private final Set<Long> statsDurations;
@@ -59,10 +60,19 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                     while (iterator.hasNext()) {
                         Entry<Long, V> entry = iterator.next();
                         if (now - entry.getKey() > maxTimePeriod) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("remove expired counter:{}", entry);
+                            }
                             iterator.remove();
                         }
-                        if (now - entry.getKey() > MINUTE) { // TODO merge by minute
-
+                        if (now - entry.getKey() > MERGE_THRESHOLD) {
+                            long mergedKey = entry.getKey() / MINUTE * MINUTE;
+                            counters.merge(mergedKey, entry.getValue(), counterMerger);
+                            iterator.remove();
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("merge counter:{}, merge to:{}->{}", entry, mergedKey,
+                                        counters.get(mergedKey));
+                            }
                         }
                     }
                 } , 1, 1, TimeUnit.MINUTES);
@@ -103,7 +113,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
      * @see java.lang.AutoCloseable#close()
      */
     @Override
-    public void close() throws Exception {
+    public void close() {
         cleanupScheduledFuture.cancel(false);
     }
 

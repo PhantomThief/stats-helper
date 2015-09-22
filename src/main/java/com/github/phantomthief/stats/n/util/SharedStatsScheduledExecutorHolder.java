@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.phantomthief.stats;
+package com.github.phantomthief.stats.n.util;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
