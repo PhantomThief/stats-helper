@@ -5,6 +5,9 @@ package com.github.phantomthief.stats.n.util;
 
 import java.util.concurrent.TimeUnit;
 
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormat;
+
 /**
  * @author w.vela
  */
@@ -22,7 +25,7 @@ public class SimpleDurationFormatter {
         } else if (l == TEN_SECOND) {
             return "10seconds";
         } else {
-            return l + "";
+            return PeriodFormat.getDefault().print(new Period(l));
         }
     }
 }
