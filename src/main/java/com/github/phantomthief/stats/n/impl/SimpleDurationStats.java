@@ -3,6 +3,9 @@
  */
 package com.github.phantomthief.stats.n.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -22,6 +25,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 import com.github.phantomthief.stats.n.DurationStats;
 import com.github.phantomthief.stats.n.MultiDurationStats;
 import com.github.phantomthief.stats.n.counter.Duration;
@@ -29,17 +34,17 @@ import com.github.phantomthief.stats.n.counter.SimpleCounter;
 import com.github.phantomthief.stats.n.util.DurationStatsUtils;
 import com.github.phantomthief.stats.n.util.SharedStatsScheduledExecutorHolder;
 import com.github.phantomthief.stats.n.util.SimpleDurationFormatter;
-import com.google.common.base.Preconditions;
 
 /**
  * @author w.vela
  */
 public class SimpleDurationStats<V extends Duration> implements DurationStats<V>, AutoCloseable {
 
-    private static org.slf4j.Logger logger = getLogger(SimpleDurationStats.class);
-    private static final long SECOND = TimeUnit.SECONDS.toMillis(1);
-    private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
-    private static final long MERGE_THRESHOLD = TimeUnit.MINUTES.toMillis(2);
+    private static Logger logger = getLogger(SimpleDurationStats.class);
+
+    private static final long SECOND = SECONDS.toMillis(1);
+    private static final long MINUTE = MINUTES.toMillis(1);
+    private static final long MERGE_THRESHOLD = MINUTES.toMillis(2);
 
     private final Map<Long, V> counters = new ConcurrentHashMap<>();
     private final Set<Long> statsDurations;
@@ -76,7 +81,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                             }
                         }
                     }
-                } , 1, 1, TimeUnit.MINUTES);
+                } , 1, 1, MINUTES);
     }
 
     /* (non-Javadoc)
@@ -169,8 +174,8 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
 
         public <V extends Duration> SimpleDurationStats<V> build(Function<Long, V> counterFactory,
                 BinaryOperator<V> counterMerger) {
-            Preconditions.checkNotNull(counterFactory);
-            Preconditions.checkNotNull(counterMerger);
+            checkNotNull(counterFactory);
+            checkNotNull(counterMerger);
             ensure();
             return new SimpleDurationStats<>(statsDurations, counterFactory, counterMerger);
         }
