@@ -179,7 +179,8 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
             checkNotNull(counterFactory);
             checkNotNull(counterMerger);
             ensure();
-            return new SimpleDurationStats<>(statsDurations, counterFactory, counterMerger);
+            return new SimpleDurationStats<>(new HashSet<>(statsDurations), counterFactory,
+                    counterMerger);
         }
 
         public <K> SimpleMultiDurationStats<K, SimpleCounter> buildMulti() {
