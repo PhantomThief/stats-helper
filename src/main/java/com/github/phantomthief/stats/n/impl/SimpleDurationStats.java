@@ -69,6 +69,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                                 logger.debug("remove expired counter:{}", entry);
                             }
                             iterator.remove();
+                            continue;
                         }
                         if (entry.getValue().duration() == SECOND
                                 && now - entry.getKey() > MERGE_THRESHOLD) {
@@ -79,6 +80,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                                 logger.debug("merge counter:{}, merge to:{}->{}", entry, mergedKey,
                                         counters.get(mergedKey));
                             }
+                            continue;
                         }
                     }
                 } , 1, 1, MINUTES);
