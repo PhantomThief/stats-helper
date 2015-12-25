@@ -21,7 +21,7 @@ public class SimpleDurationStatsTest {
 
     @Test
     public void test() throws Exception {
-        SimpleDurationStats<SimpleCounter> durationStats = SimpleDurationStats.newBuilder().build();
+        DurationStats<SimpleCounter> durationStats = SimpleDurationStats.newBuilder().build();
         for (int i = 0; i < 10; i++) {
             durationStats.stat(SimpleCounter.stats(10));
         }
