@@ -4,6 +4,7 @@
 package com.github.phantomthief.stats.n.profiler.util;
 
 import java.lang.reflect.Field;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -11,15 +12,22 @@ import com.github.phantomthief.stats.n.profiler.anntation.Aggregation;
 import com.github.phantomthief.stats.n.profiler.anntation.MaxValue;
 import com.github.phantomthief.stats.n.profiler.stats.Stats;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author w.vela
  */
 public class StatsMergeUtils {
 
+    private static final Set<Class<?>> SUPPORT_CLASS = ImmutableSet.of(Number.class, Integer.TYPE,
+            Long.TYPE);
+
     public static <T extends Stats> T annotationBasedMerge(T base, T other) {
         Field[] fields = base.getClass().getDeclaredFields();
         for (Field field : fields) {
+            if (!SUPPORT_CLASS.stream().anyMatch(type -> type.isAssignableFrom(field.getType()))) {
+                continue;
+            }
             if (!field.isAccessible()) {
                 field.setAccessible(true);
             }
