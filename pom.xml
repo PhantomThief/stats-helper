@@ -56,6 +56,11 @@
         </dependency>
         <dependency>
             <groupId>com.github.phantomthief</groupId>
+            <artifactId>buffer-trigger</artifactId>
+            <version>0.2.6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.phantomthief</groupId>
             <artifactId>more-lambdas</artifactId>
             <version>0.1.5-SNAPSHOT</version>
         </dependency>
