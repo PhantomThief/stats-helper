@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.github.phantomthief.stats.n.profiler.anntation.Sum;
 import com.github.phantomthief.stats.n.profiler.anntation.Max;
+import com.github.phantomthief.stats.n.profiler.anntation.Sum;
 import com.github.phantomthief.stats.n.profiler.stats.Stats;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
@@ -34,6 +34,10 @@ public class StatsMergeUtils {
             if (field.isAnnotationPresent(Sum.class)) {
                 doAggregation(field, base, other);
             } else if (field.isAnnotationPresent(Max.class)) {
+                doMaxValue(field, base, other);
+            } else if (field.getDeclaringClass().isAnnotationPresent(Sum.class)) {
+                doAggregation(field, base, other);
+            } else if (field.getDeclaringClass().isAnnotationPresent(Max.class)) {
                 doMaxValue(field, base, other);
             } else {
                 throw new IllegalArgumentException("no annotation found in field:" + field);

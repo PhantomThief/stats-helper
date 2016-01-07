@@ -5,16 +5,16 @@ package com.github.phantomthief.stats.n.profiler;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.github.phantomthief.stats.n.profiler.anntation.Sum;
 import com.github.phantomthief.stats.n.profiler.anntation.Max;
+import com.github.phantomthief.stats.n.profiler.anntation.Sum;
 import com.github.phantomthief.stats.n.profiler.stats.Stats;
 
 /**
  * @author w.vela
  */
+@Sum
 public class SimpleStats implements Stats {
 
-    @Sum
     private final AtomicLong count;
     @Max
     private volatile long maxCost;

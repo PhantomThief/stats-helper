@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 /**
  * @author w.vela
  */
-@Target({ ElementType.FIELD })
+@Target({ ElementType.FIELD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Max {
 
