@@ -3,7 +3,7 @@
  */
 package com.github.phantomthief.stats.n.profiler.stats;
 
-import com.github.phantomthief.stats.n.profiler.util.StatsMergeUtils;
+import static com.github.phantomthief.stats.n.profiler.util.StatsMergeUtils.annotationBasedMerge;
 
 /**
  * @author w.vela
@@ -11,6 +11,6 @@ import com.github.phantomthief.stats.n.profiler.util.StatsMergeUtils;
 public interface Stats {
 
     default Stats merge(Stats other) {
-        return StatsMergeUtils.annotationBasedMerge(this, other);
+        return annotationBasedMerge(this, other);
     }
 }

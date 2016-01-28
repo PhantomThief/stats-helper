@@ -18,11 +18,12 @@ public class SimpleCounter implements Duration {
     private final AtomicLong cost = new AtomicLong();
     private long duration;
 
-    /**
-     * @param duration
-     */
     public SimpleCounter(long duration) {
         this.duration = duration;
+    }
+
+    public static Consumer<SimpleCounter> stats(long cost) {
+        return counter -> counter.doStats(cost);
     }
 
     private void doStats(long cost) {
@@ -42,14 +43,10 @@ public class SimpleCounter implements Duration {
         return (double) count.get() / duration * 1000;
     }
 
-    public static Consumer<SimpleCounter> stats(long cost) {
-        return counter -> counter.doStats(cost);
-    }
-
     @Override
     public String toString() {
-        return "count:" + count + ", cost:" + cost + ", avgCost:"
-                + (double) (cost.get()) / count.get() + ", duration:"
+        return "count:" + count + ", cost:" + cost + ", avgCost:" + (double) (cost.get())
+                / count.get() + ", duration:"
                 + PeriodFormat.getDefault().print(new Period(duration));
     }
 

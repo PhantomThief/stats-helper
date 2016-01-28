@@ -15,10 +15,6 @@ public class StatsDTO<T extends StatsKey<E>, E extends Stats> {
         // 无参构建喂狗(jackson)
     }
 
-    /**
-     * @param key
-     * @param stats
-     */
     public StatsDTO(T key, E stats) {
         this.key = key;
         this.stats = stats;

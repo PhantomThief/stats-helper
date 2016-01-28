@@ -3,13 +3,15 @@
  */
 package com.github.phantomthief.stats.n.impl;
 
+import static com.github.phantomthief.stats.n.util.SharedStatsScheduledExecutorHolder.getInstance;
 import static com.github.phantomthief.util.MoreSuppliers.lazy;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Comparator.naturalOrder;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,7 +31,6 @@ import com.github.phantomthief.stats.n.DurationStats;
 import com.github.phantomthief.stats.n.counter.Duration;
 import com.github.phantomthief.stats.n.counter.SimpleCounter;
 import com.github.phantomthief.stats.n.util.DurationStatsUtils;
-import com.github.phantomthief.stats.n.util.SharedStatsScheduledExecutorHolder;
 import com.github.phantomthief.stats.n.util.SimpleDurationFormatter;
 
 /**
@@ -37,12 +38,10 @@ import com.github.phantomthief.stats.n.util.SimpleDurationFormatter;
  */
 public class SimpleDurationStats<V extends Duration> implements DurationStats<V> {
 
-    private static Logger logger = getLogger(SimpleDurationStats.class);
-
     private static final long SECOND = SECONDS.toMillis(1);
     private static final long MINUTE = MINUTES.toMillis(1);
     private static final long MERGE_THRESHOLD = MINUTES.toMillis(2);
-
+    private static Logger logger = getLogger(SimpleDurationStats.class);
     private final Map<Long, V> counters = new ConcurrentHashMap<>();
     private final Set<Long> statsDurations;
     private final Function<Long, V> counterFactory;
@@ -51,13 +50,13 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
 
     private SimpleDurationStats(Set<Long> statsDurations, Function<Long, V> counterFactory,
             BinaryOperator<V> counterMerger) {
-        long maxTimePeriod = statsDurations.stream().max(Comparator.naturalOrder()).get();
+        long maxTimePeriod = statsDurations.stream().max(naturalOrder()).get();
         this.statsDurations = statsDurations;
         this.counterFactory = counterFactory;
         this.counterMerger = counterMerger;
-        this.cleanupScheduledFuture = SharedStatsScheduledExecutorHolder.getInstance()
-                .scheduleWithFixedDelay(() -> {
-                    long now = System.currentTimeMillis();
+        this.cleanupScheduledFuture = getInstance().scheduleWithFixedDelay(
+                () -> {
+                    long now = currentTimeMillis();
                     Iterator<Entry<Long, V>> iterator = counters.entrySet().iterator();
                     while (iterator.hasNext()) {
                         Entry<Long, V> entry = iterator.next();
@@ -77,10 +76,13 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                                 logger.debug("merge counter:{}, merge to:{}->{}", entry, mergedKey,
                                         counters.get(mergedKey));
                             }
-                            continue;
                         }
                     }
                 }, 1, 1, MINUTES);
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     /* (non-Javadoc)
@@ -89,7 +91,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
     @Override
     public void stat(Consumer<V> statsFunction) {
         try {
-            long timePoint = System.currentTimeMillis() / SECOND * SECOND;
+            long timePoint = currentTimeMillis() / SECOND * SECOND;
             V counter = counters.computeIfAbsent(timePoint, t -> counterFactory.apply(SECOND));
             statsFunction.accept(counter);
         } catch (Throwable e) {
@@ -103,14 +105,12 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
     @Override
     public Map<Long, V> getStats() {
         Map<Long, V> result = new HashMap<>();
-        long now = System.currentTimeMillis();
-        counters.forEach((d, counter) -> {
-            statsDurations.forEach(s -> {
-                if (now - d <= s) {
-                    result.merge(s, counter, counterMerger);
-                }
-            });
-        });
+        long now = currentTimeMillis();
+        counters.forEach((d, counter) -> statsDurations.forEach(s -> {
+            if (now - d <= s) {
+                result.merge(s, counter, counterMerger);
+            }
+        }));
         return result;
     }
 
@@ -154,13 +154,13 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
             return buildMulti(SimpleCounter::new);
         }
 
-        public <K, V extends Duration> SimpleMultiDurationStats<K, V>
-                buildMulti(Function<Long, V> counterFactory) {
+        public <K, V extends Duration> SimpleMultiDurationStats<K, V> buildMulti(
+                Function<Long, V> counterFactory) {
             return buildMulti(counterFactory, DurationStatsUtils::merge);
         }
 
-        public <K, V extends Duration> SimpleMultiDurationStats<K, V>
-                buildMulti(Function<Long, V> counterFactory, BinaryOperator<V> counterMerger) {
+        public <K, V extends Duration> SimpleMultiDurationStats<K, V> buildMulti(
+                Function<Long, V> counterFactory, BinaryOperator<V> counterMerger) {
             return new SimpleMultiDurationStats<>(() -> build(counterFactory, counterMerger));
         }
 
@@ -171,9 +171,5 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
                 statsDurations.add(SimpleDurationFormatter.TEN_SECOND);
             }
         }
-    }
-
-    public static final Builder newBuilder() {
-        return new Builder();
     }
 }

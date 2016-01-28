@@ -50,7 +50,7 @@ public final class BufferStatsProfilerHelper {
     private boolean addToBuffer(Map<StatsKey<?>, Stats> buffer,
             StatsDTO<? extends StatsKey<?>, Stats> wrapper) {
         Stats stats = wrapper.getStats();
-        return stats == buffer.merge(wrapper.getKey(), (Stats) stats, Stats::merge);
+        return stats == buffer.merge(wrapper.getKey(), stats, Stats::merge);
     }
 
     private void reject(StatsDTO<? extends StatsKey<?>, ? extends Stats> wrapper) {

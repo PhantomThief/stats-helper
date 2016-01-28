@@ -3,7 +3,9 @@
  */
 package com.github.phantomthief.stats.n.util;
 
-import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormat;
@@ -13,11 +15,11 @@ import org.joda.time.format.PeriodFormat;
  */
 public class SimpleDurationFormatter {
 
-    public static final long TEN_SECOND = TimeUnit.SECONDS.toMillis(10);
-    public static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
-    public static final long HOUR = TimeUnit.HOURS.toMillis(1);
+    public static final long TEN_SECOND = SECONDS.toMillis(10);
+    public static final long MINUTE = MINUTES.toMillis(1);
+    public static final long HOUR = HOURS.toMillis(1);
 
-    public static final String format(long l) {
+    public static String format(long l) {
         if (l == HOUR) {
             return "hour";
         } else if (l == MINUTE) {

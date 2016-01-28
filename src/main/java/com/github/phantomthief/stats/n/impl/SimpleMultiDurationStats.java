@@ -16,30 +16,21 @@ import com.github.phantomthief.stats.n.DurationStats;
 import com.github.phantomthief.stats.n.MultiDurationStats;
 import com.github.phantomthief.stats.n.counter.Duration;
 
-public final class SimpleMultiDurationStats<K, V extends Duration>
-                                           implements MultiDurationStats<K, V> {
+final class SimpleMultiDurationStats<K, V extends Duration> implements
+                                                                   MultiDurationStats<K, V> {
 
     private final ConcurrentMap<K, DurationStats<V>> map = new ConcurrentHashMap<>();
     private final Supplier<DurationStats<V>> statsFactory;
 
-    /**
-     * @param statsFactory
-     */
     SimpleMultiDurationStats(Supplier<DurationStats<V>> statsFactory) {
         this.statsFactory = statsFactory;
     }
 
-    /* (non-Javadoc)
-     * @see com.github.phantomthief.stats.n.MultiDurationStats#stat(java.lang.Object, java.util.function.Consumer)
-     */
     @Override
     public void stat(K key, Consumer<V> statsFunction) {
         map.computeIfAbsent(key, k -> statsFactory.get()).stat(statsFunction);
     }
 
-    /* (non-Javadoc)
-     * @see com.github.phantomthief.stats.n.MultiDurationStats#getStats()
-     */
     @Override
     public Map<K, Map<Long, V>> getStats() {
         return map.entrySet().stream().collect(toMap(Entry::getKey, e -> e.getValue().getStats()));

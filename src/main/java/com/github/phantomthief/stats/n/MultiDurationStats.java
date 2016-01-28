@@ -13,7 +13,7 @@ import com.github.phantomthief.stats.n.counter.Duration;
  */
 public interface MultiDurationStats<K, V extends Duration> {
 
-    public void stat(K key, Consumer<V> statsFunction);
+    void stat(K key, Consumer<V> statsFunction);
 
-    public Map<K, Map<Long, V>> getStats();
+    Map<K, Map<Long, V>> getStats();
 }

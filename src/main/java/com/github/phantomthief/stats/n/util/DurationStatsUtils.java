@@ -23,7 +23,7 @@ public final class DurationStatsUtils {
         throw new UnsupportedOperationException();
     }
 
-    public static final <V extends Duration> V merge(V o1, V o2) {
+    public static <V extends Duration> V merge(V o1, V o2) {
         if (o2 == null) {
             throw new IllegalStateException();
         }
@@ -49,15 +49,7 @@ public final class DurationStatsUtils {
         }
     }
 
-    /**
-     * @param result
-     * @param o1
-     * @param o2
-     * @param object
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
-     */
-    private static final <V> V doGet(Field field, Object result, Function<Number, V> getter)
+    private static <V> V doGet(Field field, Object result, Function<Number, V> getter)
             throws IllegalArgumentException, IllegalAccessException {
         field.setAccessible(true);
         Object object = field.get(result);
@@ -77,16 +69,14 @@ public final class DurationStatsUtils {
             Map<K, Map<Long, T>> map, Function<K, String> keyConverter,
             Function<T, R> valueConverter) {
         Map<String, Map<String, R>> result = new HashMap<>();
-        map.forEach((key, stats) -> {
-            stats.forEach((period, stat) -> {
-                result.merge(keyConverter.apply(key),
-                        single(SimpleDurationFormatter.format(period), valueConverter.apply(stat)),
-                        (m1, m2) -> {
-                    m1.putAll(m2);
-                    return m1;
-                });
-            });
-        });
+        map.forEach((key, stats) -> stats.forEach((period, stat) -> {
+            result.merge(keyConverter.apply(key),
+                    single(SimpleDurationFormatter.format(period), valueConverter.apply(stat)), (
+                            m1, m2) -> {
+                        m1.putAll(m2);
+                        return m1;
+                    });
+        }));
         return result;
     }
 
