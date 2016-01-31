@@ -1,7 +1,7 @@
 <project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.phantomthief</groupId>
     <artifactId>stats-helper</artifactId>
@@ -35,7 +35,8 @@
     <scm>
         <connection>scm:git:https://github.com/PhantomThief/stats-helper.git</connection>
         <url>https://github.com/PhantomThief/stats-helper.git</url>
-        <developerConnection>scm:git:https://github.com/PhantomThief/stats-helper.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/PhantomThief/stats-helper.git
+        </developerConnection>
     </scm>
 
     <dependencies>
@@ -47,12 +48,12 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.8.2</version>
+            <version>2.8.3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.13</version>
+            <version>1.7.14</version>
         </dependency>
         <dependency>
             <groupId>com.github.phantomthief</groupId>
@@ -78,7 +79,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.5</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
