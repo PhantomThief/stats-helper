@@ -71,8 +71,8 @@ public final class DurationStatsUtils {
         Map<String, Map<String, R>> result = new HashMap<>();
         map.forEach((key, stats) -> stats.forEach((period, stat) -> {
             result.merge(keyConverter.apply(key),
-                    single(SimpleDurationFormatter.format(period), valueConverter.apply(stat)), (
-                            m1, m2) -> {
+                    single(SimpleDurationFormatter.format(period), valueConverter.apply(stat)),
+                    (m1, m2) -> {
                         m1.putAll(m2);
                         return m1;
                     });

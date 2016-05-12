@@ -10,9 +10,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import org.junit.Test;
+
 import com.github.phantomthief.stats.n.counter.SimpleCounter;
 import com.github.phantomthief.stats.n.impl.SimpleDurationStats;
-import org.junit.Test;
 
 /**
  * @author w.vela

@@ -45,8 +45,8 @@ public class SimpleCounter implements Duration {
 
     @Override
     public String toString() {
-        return "count:" + count + ", cost:" + cost + ", avgCost:" + (double) (cost.get())
-                / count.get() + ", duration:"
+        return "count:" + count + ", cost:" + cost + ", avgCost:"
+                + (double) (cost.get()) / count.get() + ", duration:"
                 + PeriodFormat.getDefault().print(new Period(duration));
     }
 

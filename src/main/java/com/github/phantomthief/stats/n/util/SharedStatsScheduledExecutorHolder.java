@@ -27,7 +27,8 @@ public class SharedStatsScheduledExecutorHolder {
     private static class LazyHolder {
 
         private static final ScheduledExecutorService INSTANCE = newScheduledThreadPool(
-                THREAD_COUNT, new ThreadFactoryBuilder() //
+                THREAD_COUNT,
+                new ThreadFactoryBuilder() //
                         .setNameFormat("scheduled-stats-helper-%d") //
                         .setPriority(MIN_PRIORITY) //
                         .setDaemon(true) //

@@ -16,8 +16,7 @@ import com.github.phantomthief.stats.n.DurationStats;
 import com.github.phantomthief.stats.n.MultiDurationStats;
 import com.github.phantomthief.stats.n.counter.Duration;
 
-final class SimpleMultiDurationStats<K, V extends Duration> implements
-                                                                   MultiDurationStats<K, V> {
+final class SimpleMultiDurationStats<K, V extends Duration> implements MultiDurationStats<K, V> {
 
     private final ConcurrentMap<K, DurationStats<V>> map = new ConcurrentHashMap<>();
     private final Supplier<DurationStats<V>> statsFactory;

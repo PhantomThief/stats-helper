@@ -54,40 +54,36 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
         this.statsDurations = statsDurations;
         this.counterFactory = counterFactory;
         this.counterMerger = counterMerger;
-        this.cleanupScheduledFuture = getInstance().scheduleWithFixedDelay(
-                () -> {
-                    long now = currentTimeMillis();
-                    Iterator<Entry<Long, V>> iterator = counters.entrySet().iterator();
-                    while (iterator.hasNext()) {
-                        Entry<Long, V> entry = iterator.next();
-                        if (now - entry.getKey() > maxTimePeriod) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("remove expired counter:{}", entry);
-                            }
-                            iterator.remove();
-                            continue;
-                        }
-                        if (entry.getValue().duration() == SECOND
-                                && now - entry.getKey() > MERGE_THRESHOLD) {
-                            long mergedKey = entry.getKey() / MINUTE * MINUTE;
-                            counters.merge(mergedKey, entry.getValue(), counterMerger);
-                            iterator.remove();
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("merge counter:{}, merge to:{}->{}", entry, mergedKey,
-                                        counters.get(mergedKey));
-                            }
-                        }
+        this.cleanupScheduledFuture = getInstance().scheduleWithFixedDelay(() -> {
+            long now = currentTimeMillis();
+            Iterator<Entry<Long, V>> iterator = counters.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Entry<Long, V> entry = iterator.next();
+                if (now - entry.getKey() > maxTimePeriod) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("remove expired counter:{}", entry);
                     }
-                }, 1, 1, MINUTES);
+                    iterator.remove();
+                    continue;
+                }
+                if (entry.getValue().duration() == SECOND
+                        && now - entry.getKey() > MERGE_THRESHOLD) {
+                    long mergedKey = entry.getKey() / MINUTE * MINUTE;
+                    counters.merge(mergedKey, entry.getValue(), counterMerger);
+                    iterator.remove();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("merge counter:{}, merge to:{}->{}", entry, mergedKey,
+                                counters.get(mergedKey));
+                    }
+                }
+            }
+        }, 1, 1, MINUTES);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    /* (non-Javadoc)
-     * @see com.github.phantomthief.stats.n.DurationStats#stat(java.util.function.Consumer)
-     */
     @Override
     public void stat(Consumer<V> statsFunction) {
         try {
@@ -99,9 +95,6 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
         }
     }
 
-    /* (non-Javadoc)
-     * @see com.github.phantomthief.stats.n.DurationStats#getStats()
-     */
     @Override
     public Map<Long, V> getStats() {
         Map<Long, V> result = new HashMap<>();
@@ -114,9 +107,6 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.AutoCloseable#close()
-     */
     @Override
     public void close() {
         cleanupScheduledFuture.cancel(false);
@@ -154,13 +144,13 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
             return buildMulti(SimpleCounter::new);
         }
 
-        public <K, V extends Duration> SimpleMultiDurationStats<K, V> buildMulti(
-                Function<Long, V> counterFactory) {
+        public <K, V extends Duration> SimpleMultiDurationStats<K, V>
+                buildMulti(Function<Long, V> counterFactory) {
             return buildMulti(counterFactory, DurationStatsUtils::merge);
         }
 
-        public <K, V extends Duration> SimpleMultiDurationStats<K, V> buildMulti(
-                Function<Long, V> counterFactory, BinaryOperator<V> counterMerger) {
+        public <K, V extends Duration> SimpleMultiDurationStats<K, V>
+                buildMulti(Function<Long, V> counterFactory, BinaryOperator<V> counterMerger) {
             return new SimpleMultiDurationStats<>(() -> build(counterFactory, counterMerger));
         }
 
