@@ -6,11 +6,11 @@ package com.github.phantomthief.stats.n;
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.github.phantomthief.stats.n.counter.SimpleCounter;
 import com.github.phantomthief.stats.n.impl.SimpleDurationStats;
@@ -18,10 +18,10 @@ import com.github.phantomthief.stats.n.impl.SimpleDurationStats;
 /**
  * @author w.vela
  */
-public class SimpleDurationStatsTest {
+class SimpleDurationStatsTest {
 
     @Test
-    public void test() throws Exception {
+    void test() {
         DurationStats<SimpleCounter> durationStats = SimpleDurationStats.newBuilder().build();
         for (int i = 0; i < 10; i++) {
             durationStats.stat(SimpleCounter.stats(10));
