@@ -47,9 +47,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/PhantomThief/stats-helper.git</connection>
+        <connection>scm:git:git@github.com:PhantomThief/stats-helper.git</connection>
         <url>https://github.com/PhantomThief/stats-helper.git</url>
-        <developerConnection>scm:git:https://github.com/PhantomThief/stats-helper.git
+        <developerConnection>scm:git:git@github.com:PhantomThief/stats-helper.git
         </developerConnection>
     </scm>
 
