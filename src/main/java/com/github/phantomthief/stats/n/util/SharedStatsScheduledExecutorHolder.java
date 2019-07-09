@@ -28,10 +28,10 @@ public class SharedStatsScheduledExecutorHolder {
 
         private static final ScheduledExecutorService INSTANCE = newScheduledThreadPool(
                 THREAD_COUNT,
-                new ThreadFactoryBuilder() //
-                        .setNameFormat("scheduled-stats-helper-%d") //
-                        .setPriority(MIN_PRIORITY) //
-                        .setDaemon(true) //
+                new ThreadFactoryBuilder()
+                        .setNameFormat("scheduled-stats-helper-%d")
+                        .setPriority(MIN_PRIORITY)
+                        .setDaemon(true)
                         .build());
     }
 
