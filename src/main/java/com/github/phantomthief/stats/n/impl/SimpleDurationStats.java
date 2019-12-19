@@ -41,7 +41,7 @@ public class SimpleDurationStats<V extends Duration> implements DurationStats<V>
     private static final long SECOND = SECONDS.toMillis(1);
     private static final long MINUTE = MINUTES.toMillis(1);
     private static final long MERGE_THRESHOLD = MINUTES.toMillis(2);
-    private static Logger logger = getLogger(SimpleDurationStats.class);
+    private static final Logger logger = getLogger(SimpleDurationStats.class);
     private final Map<Long, V> counters = new ConcurrentHashMap<>();
     private final Set<Long> statsDurations;
     private final Function<Long, V> counterFactory;
