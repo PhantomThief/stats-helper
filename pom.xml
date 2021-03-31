@@ -22,7 +22,7 @@
     </developers>
 
     <properties>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <joda-time.version>2.9.3</joda-time.version>
         <slf4j-api.version>1.7.14</slf4j-api.version>
         <more-lambdas.version>0.1.8</more-lambdas.version>
